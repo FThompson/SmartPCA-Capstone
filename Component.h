@@ -6,6 +6,7 @@
 #define Component_h
 
 #include <Adafruit_GFX.h>
+#include "States.h"
 
 class Component {
 public:
@@ -15,7 +16,7 @@ public:
   int h;
   
   Component(int x, int y, int w, int h);
-  virtual bool isValid();
+  virtual bool isValid(State state);
   virtual void onRepaint(Adafruit_GFX &g);
   virtual void onTouch(int x, int y);
   bool contains(int x, int y);

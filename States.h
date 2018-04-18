@@ -20,6 +20,4 @@ enum class State {
   CONTACT
 };
 
-State state = State::HOME;
-
 #endif

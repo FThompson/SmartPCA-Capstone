@@ -1,5 +1,5 @@
 /*
- * 
+ * Menu icon and menu components.
  */
 
 #ifndef MenuComponents_h
@@ -11,7 +11,7 @@
 class MenuIcon : public Component {
 public:
   MenuIcon();
-  bool isValid();
+  bool isValid(State state);
   void onRepaint(Adafruit_GFX &g);
   void onTouch(int x, int y);
 };
