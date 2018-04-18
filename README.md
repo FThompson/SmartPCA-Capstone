@@ -1,0 +1,2 @@
+# SmartPCA-Capstone
+This repository contains the code for my team's Human-Centered Design &amp; Engineering (HCDE) Capstone project @ University of Washington. We researched, designed, prototyped, evaluated, and iterated a two-compartment touchscreen smart device for post-operative patients that holds prescription opioids in one compartment and Tylenol (or other OTC pain medication) in the other while tracking dose timing and recording dose data.
