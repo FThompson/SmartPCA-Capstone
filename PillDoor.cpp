@@ -1,9 +1,9 @@
 /*
- Opens or closes a device pill dispensing door.
-
- Code inspiration from Sweeper by BARRAGAN
- http://www.arduino.cc/en/Tutorial/Sweep
-*/
+ * Opens or closes a device pill dispensing door.
+ *
+ * Code inspiration from Sweeper by BARRAGAN
+ * http://www.arduino.cc/en/Tutorial/Sweep
+ */
 
 #include "PillDoor.h"
 #include "Arduino.h"

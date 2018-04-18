@@ -49,7 +49,7 @@ uint32_t read32(File &f) {
   return result;
 }
 
-void drawBMP(Adafruit_HX8357 tft, char *filename, uint8_t x, uint16_t y) {
+void drawBMP(Adafruit_HX8357 &tft, const char *filename, uint8_t x, uint16_t y) {
 
   File     bmpFile;
   int      bmpWidth, bmpHeight;   // W+H in pixels
@@ -72,7 +72,7 @@ void drawBMP(Adafruit_HX8357 tft, char *filename, uint8_t x, uint16_t y) {
   Serial.println('\'');
 
   // Open requested file on SD card
-  if ((bmpFile = SD.open(filename)) == NULL) {
+  if (!(bmpFile = SD.open(filename))) {
     Serial.print(F("File not found"));
     return;
   }

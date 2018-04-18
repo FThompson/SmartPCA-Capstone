@@ -1,6 +1,6 @@
 /*
- Controls an LED, either via PWM (with setBrightness) or digital on/off.
-*/
+ * Controls an LED, either via PWM (with setBrightness) or digital on/off.
+ */
 
 #include "LED.h"
 #include "Arduino.h"

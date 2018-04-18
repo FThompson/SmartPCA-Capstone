@@ -9,6 +9,13 @@
 #include "PillDoor.h"
 #include <SD.h>
 #include "DrawBMP.h"
+#include "Component.h"
+#include "States.h"
+
+// non-SPI tft pins
+#define TFT_DC 2
+#define TFT_CS 3
+#define SD_CS 4
 
 // touchscreen analog pins
 #define YP A2
@@ -16,20 +23,16 @@
 #define YM 7
 #define XP 8
 
-// calibration data for the raw touch data to the screen coordinates
+// touch calibration data
 #define TS_MINX 110
 #define TS_MINY 80
 #define TS_MAXX 900
 #define TS_MAXY 940
-
 #define MINPRESSURE 10
 #define MAXPRESSURE 1000
 #define TOUCH_RESISTANCE 300 // resistance across X plate
 
-#define TFT_DC 2
-#define TFT_CS 3
-#define SD_CS 4
-
+// component pinouts
 #define AUDIO_PIN 5
 #define BACKLIGHT_PIN 6
 #define LEFT_SERVO_PIN 9
@@ -57,11 +60,12 @@ void setup() {
   rightLED.turnOn();
   leftDoor.attach(LEFT_SERVO_PIN);
   rightDoor.attach(RIGHT_SERVO_PIN);
-  drawBMP(tft, "jumpers.bmp", 0, 0);
+  //drawBMP(tft, "jumpers.bmp", 0, 0);
 }
 
 void loop() {
   leftDoor.update();
   rightDoor.update();
+  // for each component, if component is valid, paint
 }
 
