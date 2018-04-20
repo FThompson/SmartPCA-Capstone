@@ -12,6 +12,22 @@ Component::Component(int x, int y, int w, int h) {
   this->h = h;
 }
 
+int Component::getX() {
+  return this->x;
+}
+
+int Component::getY() {
+  return this->y;
+}
+
+int Component::getWidth() {
+  return this->w;
+}
+
+int Component::getHeight() {
+  return this->h;
+}
+
 bool Component::contains(int x, int y) {
   return (x >= this->x) && (x <= this->x + this->w) && (y >= this->y) && (y <= this->y + this->h);
 }

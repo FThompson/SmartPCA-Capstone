@@ -13,7 +13,8 @@ public:
   MenuIcon();
   bool isValid(State state);
   void onRepaint(Adafruit_GFX &g);
-  void onTouch(int x, int y);
+  void onPress(TouchEvent event);
+  void onClick(TouchEvent event);
 };
 
 #endif

@@ -9,9 +9,11 @@
 #include "States.h"
 
 #define MENU_ICON_X 300
-#define MENU_ICON_Y 300
+#define MENU_ICON_Y 30
 #define MENU_ICON_WIDTH 30
 #define MENU_ICON_HEIGHT 30
+
+int color = BLACK;
 
 MenuIcon::MenuIcon() : Component(MENU_ICON_X, MENU_ICON_Y, MENU_ICON_WIDTH, MENU_ICON_HEIGHT) {
   
@@ -31,12 +33,27 @@ bool MenuIcon::isValid(State state) {
 
 // draw hamburger menu
 void MenuIcon::onRepaint(Adafruit_GFX &g) {
-  g.fillRoundRect(dx(0), dy(0), w, 8, 4, BLACK);
-  g.fillRoundRect(dx(0), dy(11), w, 8, 4, BLACK);
-  g.fillRoundRect(dx(0), dy(22), w, 8, 4, BLACK);
+  Serial.println("painting menu icon");
+  g.fillRoundRect(dx(0), dy(0), w, 8, 4, color);
+  g.fillRoundRect(dx(0), dy(11), w, 8, 4, color);
+  g.fillRoundRect(dx(0), dy(22), w, 8, 4, color);
 }
 
-void MenuIcon::onTouch(int x, int y) {
-  
+void MenuIcon::onPress(TouchEvent event) {
+  color = RED;
+  this->repaint();
+  Serial.print("menu icon pressed x=");
+  Serial.print(event.getX());
+  Serial.print(", y=");
+  Serial.println(event.getY());
+}
+
+void MenuIcon::onClick(TouchEvent event) {
+  color = BLACK;
+  this->repaint();
+  Serial.print("menu icon clicked x=");
+  Serial.print(event.getX());
+  Serial.print(", y=");
+  Serial.println(event.getY());
 }
 
