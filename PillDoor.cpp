@@ -9,22 +9,22 @@
 #include "Arduino.h"
 #include <Servo.h>
 
-PillDoor::PillDoor(int duration) {
+PillDoor::PillDoor(int pin, int duration) {
+  this->pin = pin;
   this->updateInterval = duration / 180;
-}
-
-void PillDoor::attach(int pin) {
-  this->servo.attach(pin);
-  this->servo.write(0); // avoid startup glitch movement
 }
 
 void PillDoor::dispense() {
   dispensing = true;
+  Serial.print("attaching on pin ");
+  Serial.println(pin);
+  this->servo.attach(pin);
 }
 
 // to be called every cycle regardless of currently dispensing or not
 void PillDoor::update() {
   if (dispensing) {
+    Serial.println("dispensing");
     unsigned long ms = millis();
     if ((ms - lastUpdate) > updateInterval) {
       lastUpdate = ms;
@@ -33,6 +33,7 @@ void PillDoor::update() {
       if ((pos >= 180) || (pos <= 0)) {
         increment = -increment;
         dispensing = false;
+        servo.detach();
       }
     }
   }

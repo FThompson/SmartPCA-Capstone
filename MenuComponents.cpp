@@ -7,6 +7,7 @@
 #include <Adafruit_GFX.h>
 #include "Colors.h"
 #include "States.h"
+#include "Controls.h"
 
 #define MENU_ICON_X 300
 #define MENU_ICON_Y 30
@@ -51,6 +52,7 @@ void MenuIcon::onPress(TouchEvent event) {
 void MenuIcon::onClick(TouchEvent event) {
   color = BLACK;
   this->repaint();
+  dispense(true);
   Serial.print("menu icon clicked x=");
   Serial.print(event.getX());
   Serial.print(", y=");

@@ -12,6 +12,8 @@
 #include "States.h"
 #include "MenuComponents.h"
 #include "Component.h"
+#include "Controls.h"
+#include "FadeableLED.h"
 
 // non-SPI tft pins
 #define TFT_DC 2
@@ -50,9 +52,9 @@ Adafruit_HX8357 tft(TFT_CS, TFT_DC);
 TouchScreen ts(XP, YP, XM, YM, TOUCH_RESISTANCE);
 LED leftLED(LEFT_LED_PIN);
 LED rightLED(RIGHT_LED_PIN);
-LED backlight(BACKLIGHT_PIN);
-PillDoor leftDoor(DISPENSE_TURN_DURATION);
-PillDoor rightDoor(DISPENSE_TURN_DURATION);
+FadeableLED backlight(BACKLIGHT_PIN);
+PillDoor leftDoor(LEFT_SERVO_PIN, DISPENSE_TURN_DURATION);
+PillDoor rightDoor(RIGHT_SERVO_PIN, DISPENSE_TURN_DURATION);
 
 // software components
 int componentCount = 1;
@@ -76,11 +78,13 @@ void setup() {
   if (!SD.begin(SD_CS)) {
     Serial.println("failed to initialize SD card");
   }
-  backlight.turnOn();
-  leftLED.turnOn();
-  rightLED.turnOn();
-  leftDoor.attach(LEFT_SERVO_PIN);
-  rightDoor.attach(RIGHT_SERVO_PIN);
+  backlight.turn(true);
+  leftLED.turn(true);
+  rightLED.turn(true);
+//  leftDoor.attach(LEFT_SERVO_PIN);
+//  rightDoor.attach(RIGHT_SERVO_PIN);
+  leftDoor.dispense();
+  rightDoor.dispense();
   //drawBMP(tft, "jumpers.bmp", 0, 0);
 }
 
@@ -138,5 +142,37 @@ void translateTouchPoint(TSPoint &p) {
   int oldX = p.x;
   p.x = map(p.y, 0, tft.height(), 0, tft.width());
   p.y = map(oldX, 0, tft.width(), tft.height(), 0);
+}
+
+void dispense(bool left) {
+  if (left) {
+    leftDoor.dispense();
+  } else {
+    rightDoor.dispense();
+  }
+}
+
+void setLED(bool left, bool on) {
+  if (left) {
+    leftLED.turn(on);
+  } else {
+    rightLED.turn(on);
+  }
+}
+
+void setBrightness(int brightness) {
+  backlight.setBrightness(brightness);
+}
+
+void setBrightness(int brightness, int duration) {
+  backlight.fade(brightness, duration);
+}
+
+void playTone() {
+  
+}
+
+void setState(State newState) {
+  state = newState;
 }
 

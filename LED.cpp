@@ -15,10 +15,6 @@ void LED::setBrightness(int brightness) {
   analogWrite(pin, brightness);
 }
 
-void LED::turnOn() {
-  digitalWrite(pin, HIGH);
-}
-
-void LED::turnOff() {
-  digitalWrite(pin, LOW); 
+void LED::turn(bool on) {
+  digitalWrite(pin, on ? HIGH : LOW);
 }

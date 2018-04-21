@@ -6,14 +6,14 @@
 #define LED_h
 
 class LED {
+protected:
   int pin;
 
 public:
   LED(int pin);
   
   void setBrightness(int brightness); // brightness 0-256
-  void turnOn();
-  void turnOff();
+  void turn(bool on);
 };
 
 #endif
