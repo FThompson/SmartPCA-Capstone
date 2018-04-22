@@ -16,6 +16,7 @@ class FadeableLED : public LED {
 
 public:
   FadeableLED(int pin);
+  void turn(bool on);
   void setBrightness(int brightness);
   void fade(int brightness, int duration);
   void update();

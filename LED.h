@@ -12,7 +12,6 @@ protected:
 public:
   LED(int pin);
   
-  void setBrightness(int brightness); // brightness 0-256
   void turn(bool on);
 };
 

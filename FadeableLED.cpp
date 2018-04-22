@@ -9,7 +9,11 @@ FadeableLED::FadeableLED(int pin) : LED(pin) {
   
 }
 
-// brightness 0-256
+void FadeableLED::turn(bool on) {
+  setBrightness(on ? 255 : 0);
+}
+
+// brightness 0-255
 void FadeableLED::setBrightness(int brightness) {
   this->brightness = brightness;
   targetBrightness = brightness;
@@ -24,17 +28,9 @@ void FadeableLED::fade(int brightness, int duration) {
     updateInterval = 1; // is this necessary? ideally, would also increase increment as necessary
   }
   if (change > 0) {
-    if (change > duration) {
-      increment = change / duration;
-    } else {
-      increment = 1;
-    }
+    increment = 1;
   } else if (change < 0) {
-    if (abs(change) > duration) {
-      increment = change / duration;
-    } else {
-      increment = -1;
-    }
+    increment = -1;
   }
 }
 

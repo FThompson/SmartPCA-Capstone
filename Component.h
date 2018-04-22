@@ -33,6 +33,7 @@ public:
   int dy(int y); // translate y
   void paint(Adafruit_GFX &g);
   void repaint();
+  void clear(Adafruit_GFX &g);
 };
 
 #endif

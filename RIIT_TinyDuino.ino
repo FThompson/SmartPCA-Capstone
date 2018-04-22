@@ -3,17 +3,20 @@
 #include <Adafruit_GFX.h>
 #include <SPI.h>
 #include "Adafruit_HX8357.h"
+#include <Fonts/FreeSans12pt7b.h>
 #include "TouchScreen.h"
 #include <Servo.h>
 #include "LED.h"
 #include "PillDoor.h"
 #include <SD.h>
-#include "DrawBMP.h"
 #include "States.h"
 #include "MenuComponents.h"
 #include "Component.h"
 #include "Controls.h"
 #include "FadeableLED.h"
+#include "Colors.h"
+#include "Prescription.h"
+#include "DoseComponents.h"
 
 // non-SPI tft pins
 #define TFT_DC 2
@@ -47,6 +50,17 @@
 #define SCREEN_HZ 10;
 #define DISPENSE_TURN_DURATION 2000
 
+// state components
+State state = State::HOME;
+Prescription leftPrescription("Opioids", 3, 3 * 60 * 60 * 1000);
+Prescription rightPrescription("Tylenol", 2, 4 * 60 * 60 * 1000);
+Prescription* selectedPrescription;
+bool pressed = false;
+TSPoint lastPoint;
+int screenUpdateInterval = 1000 / SCREEN_HZ;
+unsigned long lastScreenUpdateTime;
+unsigned long lastTouchTime;
+
 // hardware components
 Adafruit_HX8357 tft(TFT_CS, TFT_DC);
 TouchScreen ts(XP, YP, XM, YM, TOUCH_RESISTANCE);
@@ -57,40 +71,44 @@ PillDoor leftDoor(LEFT_SERVO_PIN, DISPENSE_TURN_DURATION);
 PillDoor rightDoor(RIGHT_SERVO_PIN, DISPENSE_TURN_DURATION);
 
 // software components
-int componentCount = 1;
+int componentCount = 8;
+BackButton backButton;
 MenuIcon menuIcon;
-Component *components[] = { 
-  &menuIcon
+DoseInfo leftDoseInfo(RIIT_BLUE, leftPrescription);
+DoseInfo rightDoseInfo(RIIT_PURPLE, rightPrescription);
+MenuOption viewRX(14, 14, "View Prescription", State::PRESCRIPTION);
+MenuOption settings(14, 14, "Settings", State::SETTINGS);
+MenuOption contact(13, 17, "Contact Doctor", State::CONTACT);
+PrescriptionInfo prescriptionInfo("John Doe", "05/05/18", "1234567", "Take 3 pills every 3 hours");
+Component *components[] = {
+  &backButton,
+  &menuIcon,
+  &viewRX,
+  &settings,
+  &contact,
+  &prescriptionInfo,
+  &leftDoseInfo,
+  &rightDoseInfo
 };
-
-// state components
-State state = State::HOME;
-bool pressed = false;
-TSPoint lastPoint;
-int screenUpdateInterval = 1000 / SCREEN_HZ;
-unsigned long lastScreenUpdateTime;
 
 void setup() {
   Serial.begin(9600);
   tft.begin(HX8357D);
   tft.setRotation(1); // rotate to landscape mode
-  tft.fillScreen(HX8357_BLUE);
+  tft.setFont(&FreeSans12pt7b);
+  tft.fillScreen(WHITE);
   if (!SD.begin(SD_CS)) {
-    Serial.println("failed to initialize SD card");
+    Serial.println(F("failed to initialize SD card"));
   }
   backlight.turn(true);
   leftLED.turn(true);
   rightLED.turn(true);
-//  leftDoor.attach(LEFT_SERVO_PIN);
-//  rightDoor.attach(RIGHT_SERVO_PIN);
-  leftDoor.dispense();
-  rightDoor.dispense();
-  //drawBMP(tft, "jumpers.bmp", 0, 0);
 }
 
 void loop() {
   leftDoor.update();
   rightDoor.update();
+  backlight.update();
   updateComponents();
 }
 
@@ -110,6 +128,7 @@ void updateComponents() {
       pressed = true;
       translateTouchPoint(p);
       lastPoint = p;
+      lastTouchTime = ms;
     }
   } else { // no current touch
     if (pressed) {
@@ -120,14 +139,14 @@ void updateComponents() {
   // paint valid components, pass touch event if applicable
   for (int i = 0; i < componentCount; i++) {
     Component *curr = components[i];
-    if (components[i]->isValid(state)) {
-      components[i]->paint(tft);
-      if (clicked && components[i]->contains(lastPoint.x, lastPoint.y)) {
+    if (curr->isValid(state)) {
+      curr->paint(tft);
+      if (clicked && curr->contains(lastPoint.x, lastPoint.y)) {
         TouchEvent event(TouchEvent::Type::CLICK, lastPoint);
-        components[i]->onClick(event);
-      } else if (pressed && components[i]->contains(p.x, p.y)) {
+        curr->onClick(event);
+      } else if (pressed && curr->contains(p.x, p.y)) {
         TouchEvent event(TouchEvent::Type::PRESS, p);
-        components[i]->onPress(event);
+        curr->onPress(event);
       }
     }
   }
@@ -173,6 +192,31 @@ void playTone() {
 }
 
 void setState(State newState) {
+  clearComponents();
   state = newState;
+  Serial.print("setting state to ");
+  Serial.println((int) state);
+}
+
+void clearComponents() {
+  for (int i = 0; i < componentCount; i++) {
+    Component *curr = components[i];
+    if (curr->isValid(state)) {
+      curr->clear(tft);
+      curr->repaint(); // set component to needsRepaint mode for next use
+    }
+  }
+}
+
+State getState() {
+  return state;
+}
+
+void setSelectedPrescription(Prescription &prescription) {
+  selectedPrescription = &prescription;
+}
+
+Prescription* getSelectedPrescription() {
+  return selectedPrescription;
 }
 

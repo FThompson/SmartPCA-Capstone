@@ -4,6 +4,7 @@
 
 #include <Adafruit_GFX.h>
 #include "Component.h"
+#include "Colors.h"
 
 Component::Component(int x, int y, int w, int h) {
   this->x = x;
@@ -49,5 +50,17 @@ void Component::paint(Adafruit_GFX &g) {
 
 void Component::repaint() {
   needsRepaint = true;
+}
+
+void Component::clear(Adafruit_GFX &g) {
+  Serial.print("clearing ");
+  Serial.print(x);
+  Serial.print(",");
+  Serial.print(y);
+  Serial.print(",");
+  Serial.print(w);
+  Serial.print(",");
+  Serial.println(h);
+  g.fillRect(x, y, w, h, WHITE);
 }
 

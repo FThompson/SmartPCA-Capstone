@@ -14,4 +14,10 @@
 #define YELLOW   0xFFE0 
 #define WHITE    0xFFFF
 
+#define RIIT_BLUE       0x2CFB
+#define RIIT_PURPLE     0xBB5B
+#define RIIT_GREEN      0x6E72
+#define RIIT_GRAY       0x8410
+#define RIIT_LIGHT_GRAY 0xDEFB
+
 #endif
