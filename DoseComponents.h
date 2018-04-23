@@ -75,4 +75,14 @@ public:
   void drawOption(Adafruit_GFX &g, char* option, int dx, int y);
 };
 
+class DispensingInfo : public Component {
+
+public:
+  DispensingInfo();
+  bool isValid(State state);
+  void onRepaint(Adafruit_GFX &g);
+  void onPress(int x, int y);
+  void onClick(int x, int y);
+};
+
 #endif

@@ -89,6 +89,7 @@ PainQuestion painQuestion;
 DoseQuestion doseQuestion;
 OverrideQuestion overrideQuestion;
 OverrideOptions overrideOptions;
+DispensingInfo dispensingInfo;
 Component *components[] = {
   &backButton,
   &menuIcon,
@@ -102,9 +103,10 @@ Component *components[] = {
   &painQuestion,
   &doseQuestion,
   &overrideQuestion,
-  &overrideOptions
+  &overrideOptions,
+  &dispensingInfo
 };
-uint8_t componentCount = 13;
+uint8_t componentCount = 14;
 
 void setup() {
   Serial.begin(9600);
@@ -203,6 +205,9 @@ void updateDispense(PillDoor pillDoor) {
         // tone
       }
       dispenseCount--;
+      if (dispenseCount == 0) {
+        state = State::HOME;
+      }
     }
   }
 }

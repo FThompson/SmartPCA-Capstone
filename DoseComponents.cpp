@@ -311,9 +311,9 @@ void OverrideOptions::onRepaint(Adafruit_GFX &g) {
   g.setTextColor(RIIT_GRAY);
   g.setCursor(188, 73);
   g.print("Why?");
-  drawOption(g, "I am in pain right now.", 60, 95);
-  drawOption(g, "I lost or cannot take the pill.", 45, 165);
-  drawOption(g, "Pill did not dispense.", 70, 235);
+  drawOption(g, "I am in pain right now.", 75, 95);
+  drawOption(g, "I lost or cannot take the pill.", 60, 165);
+  drawOption(g, "Pill did not dispense.", 85, 235);
 }
 
 void OverrideOptions::onPress(int x, int y) {
@@ -345,7 +345,33 @@ void OverrideOptions::drawOption(Adafruit_GFX &g, char* option, int dx, int y) {
   g.fillRoundRect(39, y, 402, 48, 4, RIIT_GRAY);
   g.setTextSize(1);
   g.setTextColor(WHITE);
-  g.setCursor(39 + dx, y + 26);
+  g.setCursor(39 + dx, y + 30);
   g.print(option);
+}
+
+DispensingInfo::DispensingInfo() : Component(0, 0, 480, 320) {
+  
+}
+
+bool DispensingInfo::isValid(State state) {
+  return state == State::DISPENSING;
+}
+
+void DispensingInfo::onRepaint(Adafruit_GFX &g) {
+  g.setTextSize(2);
+  g.setTextColor(RIIT_GRAY);
+  g.setCursor(18, 153);
+  g.print(F("Dispensing "));
+  g.print(getDesiredDose());
+  g.print(F(" "));
+  g.print(getSelectedPrescription()->label);
+}
+
+void DispensingInfo::onPress(int x, int y) {
+  
+}
+
+void DispensingInfo::onClick(int x, int y) {
+  
 }
 
