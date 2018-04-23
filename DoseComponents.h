@@ -33,7 +33,6 @@ public:
 };
 
 class PainQuestion : public Component {
-  int color = RIIT_LIGHT_GRAY;
   unsigned long lastDailyTime;
 
 public:
@@ -43,6 +42,16 @@ public:
   void onPress(int x, int y);
   void onClick(int x, int y);
   bool shouldAskDaily();
+};
+
+class DoseQuestion : public Component {
+
+public:
+  DoseQuestion();
+  bool isValid(State state);
+  void onRepaint(Adafruit_GFX &g);
+  void onPress(int x, int y);
+  void onClick(int x, int y);
 };
 
 #endif

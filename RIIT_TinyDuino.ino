@@ -52,12 +52,15 @@
 
 // state components
 State state = State::HOME;
-Prescription leftPrescription("Opioids", 3, 3 * 60 * 60 * 1000L);
-Prescription rightPrescription("Tylenol", 2, 4 * 60 * 60 * 1000L);
+Prescription leftPrescription("Opioids", 3, 3 * 60 * 60 * 1000L, true);
+Prescription rightPrescription("Tylenol", 2, 4 * 60 * 60 * 1000L, false);
 Prescription* selectedPrescription;
 bool pressed = false;
 bool stateChanged = false;
+bool leftDispense = false;
 TSPoint lastPoint;
+uint8_t desiredDose;
+uint8_t dispenseCount;
 uint8_t screenUpdateInterval = 1000 / SCREEN_HZ;
 unsigned long lastScreenUpdateTime;
 unsigned long lastTouchTime;
@@ -73,7 +76,6 @@ PillDoor leftDoor(LEFT_SERVO_PIN, DISPENSE_TURN_DURATION);
 PillDoor rightDoor(RIGHT_SERVO_PIN, DISPENSE_TURN_DURATION);
 
 // software components
-uint8_t componentCount = 10;
 BackButton backButton;
 MenuIcon menuIcon;
 DoseInfo leftDoseInfo(RIIT_BLUE, leftPrescription);
@@ -84,6 +86,7 @@ MenuOption settings(14, 14, "Settings", State::SETTINGS);
 MenuOption contact(13, 17, "Contact Doctor", State::CONTACT);
 PrescriptionInfo prescriptionInfo("John Doe", "05/05/18", "1234567", "Take 3 pills every 3 hours");
 PainQuestion painQuestion;
+DoseQuestion doseQuestion;
 Component *components[] = {
   &backButton,
   &menuIcon,
@@ -94,8 +97,10 @@ Component *components[] = {
   &helloLabel,
   &leftDoseInfo,
   &rightDoseInfo,
-  &painQuestion
+  &painQuestion,
+  &doseQuestion
 };
+uint8_t componentCount = 11;
 
 void setup() {
   Serial.begin(9600);
@@ -135,6 +140,12 @@ void loop() {
   leftDoor.update();
   rightDoor.update();
   backlight.update();
+  // hacky multi dispense handling, TODO: fix w/ OOP
+  if (leftDispense) {
+    updateDispense(leftDoor);
+  } else {
+    updateDispense(rightDoor);
+  }
   updateGlance();
   updateComponents();
 }
@@ -178,6 +189,17 @@ void updateComponents() {
   stateChanged = false; // detects if a another component changes the state
 }
 
+// hacky non-oop solution to multi dispense
+// call double for resetting
+void updateDispense(PillDoor pillDoor) {
+  if (dispenseCount > 0) {
+    if (!pillDoor.isDispensing()) {
+      pillDoor.dispense();
+      dispenseCount--;
+    }
+  }
+}
+
 void updateGlance() {
   unsigned long ms = millis();
   if (state == State::HOME && (ms - lastGlanceUpdateTime) < 30000) {
@@ -204,6 +226,15 @@ void dispense(bool left) {
   } else {
     rightDoor.dispense();
   }
+}
+
+void dispense(bool left, int count) {
+  leftDispense = left;
+  dispenseCount = count * 2;
+}
+
+void setDesiredDose(int count) {
+  desiredDose = count;
 }
 
 void setLED(bool left, bool on) {

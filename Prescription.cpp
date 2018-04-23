@@ -5,7 +5,8 @@
 #include "Prescription.h"
 #include "Arduino.h"
 
-Prescription::Prescription(char* label, int maxDose, long doseWindow) : label(label), maxDose(maxDose), doseWindow(doseWindow) {
+Prescription::Prescription(char* label, int maxDose, long doseWindow, bool showOverride)
+    : label(label), maxDose(maxDose), doseWindow(doseWindow), showOverride(showOverride) {
   //lastDoses = new unsigned long[maxDose];
 }
 

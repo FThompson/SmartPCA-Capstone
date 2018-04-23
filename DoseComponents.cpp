@@ -2,6 +2,9 @@
  * 
  */
 
+// less regard for OOP and proper coding here due to time constraints
+// TODO: return and fix the spaghetti
+
 #include "DoseComponents.h"
 #include "Component.h"
 #include <Adafruit_GFX.h>
@@ -122,6 +125,12 @@ void drawFace(Adafruit_GFX &g, int x, int y, int face) {
   }
 }
 
+void drawTripleButton(Adafruit_GFX &g, int color) {
+  g.fillRect(0, 191, 480, 129, color);
+  g.fillRect(159, 191, 3, 129, WHITE);
+  g.fillRect(319, 191, 3, 129, WHITE);
+}
+
 PainQuestion::PainQuestion() : Component(0, 0, 480, 320) {
   
 }
@@ -131,24 +140,23 @@ bool PainQuestion::isValid(State state) {
 }
 
 void PainQuestion::onRepaint(Adafruit_GFX &g) {
-  g.fillRect(10, 40, 460, 150, WHITE);
+  g.fillRect(0, 40, 480, 150, WHITE);
   g.setTextSize(2);
   g.setTextColor(RIIT_GRAY);
-  g.setCursor(12, 93);
   if (shouldAskDaily()) {
+    g.setCursor(8, 93);
     g.println(F("How is your pain being"));
-    g.setCursor(82, 153);
+    g.setCursor(72, 153);
     g.println(F("managed overall?"));
   } else {
+    g.setCursor(20, 93);
     g.println(F("How tolerable is your"));
     g.setCursor(82, 153);
     g.println(F("pain right now?"));
   }
-  g.fillRect(0, 191, 480, 129, color);
+  drawTripleButton(g, RIIT_LIGHT_GRAY);
   drawFace(g, 80, 255, 0);
-  g.fillRect(159, 191, 3, 129, WHITE);
   drawFace(g, 240, 255, 1);
-  g.fillRect(319, 191, 3, 129, WHITE);
   drawFace(g, 400, 255, 2);
 }
 
@@ -157,7 +165,6 @@ void PainQuestion::onPress(int x, int y) {
 
 void PainQuestion::onClick(int x, int y) {
   if (y >= 191) {
-    color = RIIT_LIGHT_GRAY;
     if (shouldAskDaily()) {
       lastDailyTime = millis();
       repaint();
@@ -178,5 +185,65 @@ void PainQuestion::onClick(int x, int y) {
 
 bool PainQuestion::shouldAskDaily() {
   return lastDailyTime == 0 || ((millis() - lastDailyTime) > 24 * 60 * 60 * 1000L);
+}
+
+DoseQuestion::DoseQuestion() : Component(0, 0, 480, 320) {
+  
+}
+
+bool DoseQuestion::isValid(State state) {
+  return state == State::REQUEST_DOSE;
+}
+
+void DoseQuestion::onRepaint(Adafruit_GFX &g) {
+  g.setTextSize(2);
+  g.setTextColor(RIIT_GRAY);
+  g.setCursor(14, 93);
+  g.print(F("How many "));
+  g.print(getSelectedPrescription()->label);
+  g.print(F(" do"));
+  g.setCursor(34, 153);
+  g.println(F("you need right now?"));
+  drawTripleButton(g, RIIT_GRAY);
+  g.setTextColor(WHITE);
+  int maxDose = getSelectedPrescription()->maxDose; // hacky. TODO: auto size multiple buttons, no zero option
+  g.setCursor(66, 268);
+  g.print(maxDose - 2);
+  g.setCursor(226, 268);
+  g.print(maxDose - 1);
+  g.setCursor(386, 268);
+  g.print(maxDose);
+}
+
+void DoseQuestion::onPress(int x, int y) {
+  
+}
+
+void DoseQuestion::onClick(int x, int y) {
+  if (y >= 191) {
+    Serial.print(F("Selected "));
+    int doses = 0;
+    int maxDose = getSelectedPrescription()->maxDose;
+    if (x < 160) {
+      doses = maxDose - 2;
+      Serial.print(maxDose - 2);
+    } else if (x < 320) {
+      doses = maxDose - 1;
+      Serial.print(maxDose - 1);
+    } else {
+      doses = maxDose;
+      Serial.print(maxDose);
+    }
+    Serial.print(F(" doses of "));
+    Serial.println(getSelectedPrescription()->label);
+    setDesiredDose(doses);
+    if (getSelectedPrescription()->showOverride && doses > getSelectedPrescription()->getAvailableDoses()) {
+      setState(State::OVERRIDE_DOSE);
+    } else {
+      setState(State::DISPENSING);
+      getSelectedPrescription()->use(doses);
+      // dispense(getSelectedPrescription()->showOverride, doses); // so hacky
+    }
+  }
 }
 
