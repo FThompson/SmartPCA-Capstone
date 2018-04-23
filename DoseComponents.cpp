@@ -73,7 +73,7 @@ void DoseInfo::onRepaint(Adafruit_GFX &g) {
 
 void DoseInfo::drawProgressCircle(Adafruit_GFX &g) {
   g.drawRoundRect(dx(20), dy(12), 150, 150, 75, RIIT_GRAY); // full circle
-  long doseTime = 60 * 60 * 1000L;//prescription.getTimeUntilNextDose();
+  long doseTime = prescription.getTimeUntilNextDose();
   float progress = 1.0 - (doseTime / (float) prescription.doseWindow);
   float rads = 2 * PI * progress;
   float start = (5 * PI / 2) - rads;
@@ -245,5 +245,107 @@ void DoseQuestion::onClick(int x, int y) {
       // dispense(getSelectedPrescription()->showOverride, doses); // so hacky
     }
   }
+}
+
+OverrideQuestion::OverrideQuestion() : Component(0, 0, 480, 320) {
+  
+}
+
+bool OverrideQuestion::isValid(State state) {
+  return state == State::OVERRIDE_DOSE;
+}
+
+void OverrideQuestion::onRepaint(Adafruit_GFX &g) {
+  g.setTextSize(2);
+  g.setTextColor(RIIT_GRAY);
+  g.setCursor(18, 93);
+  g.print(F("Oops, next dose is in"));
+  g.setCursor(18, 153);
+  long minutes = getSelectedPrescription()->getTimeUntilNextDose() / (60 * 1000L);
+  if (minutes >= 60) {
+    long hours = ceil(minutes / 60.0);
+    g.print(hours);
+    g.print(F(" hours"));
+  } else {
+    g.print(minutes);
+    g.print(F(" minutes"));
+  }
+  g.print(F(". Would"));
+  g.setCursor(18, 213);
+  g.print(F("you like to override?"));
+  g.fillRect(0, 236, 480, 84, RIIT_GRAY);
+  g.fillRect(239, 236, 3, 84, WHITE);
+  g.setTextColor(WHITE);
+  g.setCursor(71, 292);
+  g.print(F("YES"));
+  g.setCursor(322, 292);
+  g.print(F("NO"));
+}
+
+void OverrideQuestion::onPress(int x, int y) {
+  
+}
+
+void OverrideQuestion::onClick(int x, int y) {
+  if (y >= 229) {
+    if (x < 240) {
+      Serial.println("Chose to override");
+      setState(State::OVERRIDE_REASON);
+    } else {
+      Serial.println("Chose not to override");
+      setState(State::HOME);
+    }
+  }
+}
+
+OverrideOptions::OverrideOptions() : Component(0, 0, 480, 320) {
+  
+}
+
+bool OverrideOptions::isValid(State state) {
+  return state == State::OVERRIDE_REASON;
+}
+
+void OverrideOptions::onRepaint(Adafruit_GFX &g) {
+  g.setTextSize(2);
+  g.setTextColor(RIIT_GRAY);
+  g.setCursor(188, 73);
+  g.print("Why?");
+  drawOption(g, "I am in pain right now.", 60, 95);
+  drawOption(g, "I lost or cannot take the pill.", 45, 165);
+  drawOption(g, "Pill did not dispense.", 70, 235);
+}
+
+void OverrideOptions::onPress(int x, int y) {
+  
+}
+
+void OverrideOptions::onClick(int x, int y) {
+  if (x >= 39 && x <= 402) {
+    bool clicked = false;
+    if (y >= 95 && y <= 143) {
+      Serial.println(F("Chose override: I am in pain right now."));
+      clicked = true;
+    } else if (y >= 165 && y <= 203) {
+      Serial.println(F("Chose override: I lost or cannot take the pill."));
+      clicked = true;
+    } else if (y >= 235 && y <= 283) {
+      Serial.println(F("Chose override: Pill did not dispense."));
+      clicked = true;
+    }
+    if (clicked) {
+      setState(State::DISPENSING);
+      getSelectedPrescription()->use(getDesiredDose());
+      // dispense(getSelectedPrescription()->showOverride, doses); // so hacky
+    }
+  }
+}
+
+void OverrideOptions::drawOption(Adafruit_GFX &g, char* option, int dx, int y) {
+  g.fillRoundRect(39, y, 402, 48, 4, RIIT_GRAY);
+  g.setTextSize(1);
+  g.setTextColor(WHITE);
+  g.setCursor(39 + dx, y + 26);
+  g.print(option);
 }
 

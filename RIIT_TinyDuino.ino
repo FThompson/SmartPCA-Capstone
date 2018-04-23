@@ -87,6 +87,8 @@ MenuOption contact(13, 17, "Contact Doctor", State::CONTACT);
 PrescriptionInfo prescriptionInfo("John Doe", "05/05/18", "1234567", "Take 3 pills every 3 hours");
 PainQuestion painQuestion;
 DoseQuestion doseQuestion;
+OverrideQuestion overrideQuestion;
+OverrideOptions overrideOptions;
 Component *components[] = {
   &backButton,
   &menuIcon,
@@ -98,9 +100,11 @@ Component *components[] = {
   &leftDoseInfo,
   &rightDoseInfo,
   &painQuestion,
-  &doseQuestion
+  &doseQuestion,
+  &overrideQuestion,
+  &overrideOptions
 };
-uint8_t componentCount = 11;
+uint8_t componentCount = 13;
 
 void setup() {
   Serial.begin(9600);
@@ -195,6 +199,9 @@ void updateDispense(PillDoor pillDoor) {
   if (dispenseCount > 0) {
     if (!pillDoor.isDispensing()) {
       pillDoor.dispense();
+      if (dispenseCount % 2 == 0) { // actual dispense, not servo reset
+        // tone
+      }
       dispenseCount--;
     }
   }
@@ -235,6 +242,10 @@ void dispense(bool left, int count) {
 
 void setDesiredDose(int count) {
   desiredDose = count;
+}
+
+int getDesiredDose() {
+  return desiredDose;
 }
 
 void setLED(bool left, bool on) {

@@ -54,4 +54,25 @@ public:
   void onClick(int x, int y);
 };
 
+class OverrideQuestion : public Component {
+
+public:
+  OverrideQuestion();
+  bool isValid(State state);
+  void onRepaint(Adafruit_GFX &g);
+  void onPress(int x, int y);
+  void onClick(int x, int y);
+};
+
+class OverrideOptions : public Component {
+  
+public:
+  OverrideOptions();
+  bool isValid(State state);
+  void onRepaint(Adafruit_GFX &g);
+  void onPress(int x, int y);
+  void onClick(int x, int y);
+  void drawOption(Adafruit_GFX &g, char* option, int dx, int y);
+};
+
 #endif

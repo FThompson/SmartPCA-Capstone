@@ -10,6 +10,7 @@
 void dispense(bool left);
 void dispense(bool left, int count);
 void setDesiredDose(int count);
+int getDesiredDose();
 void setLED(bool left, bool on);
 void setBrightness(int brightness);
 void setBrightness(int brightness, int duration);
