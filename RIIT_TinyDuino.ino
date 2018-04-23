@@ -48,7 +48,7 @@
 
 // device settings
 #define SCREEN_HZ 10;
-#define DISPENSE_TURN_DURATION 2000
+#define DISPENSE_TURN_DURATION 1500
 
 // state components
 State state = State::HOME;
@@ -154,6 +154,7 @@ void loop() {
   }
   updateGlance();
   updateComponents();
+  delay(1);
 }
 
 // paints components and passes touch events
@@ -197,7 +198,7 @@ void updateComponents() {
 
 // hacky non-oop solution to multi dispense
 // call double for resetting
-void updateDispense(PillDoor pillDoor) {
+void updateDispense(PillDoor &pillDoor) {
   if (dispenseCount > 0) {
     if (!pillDoor.isDispensing()) {
       pillDoor.dispense();
@@ -206,7 +207,7 @@ void updateDispense(PillDoor pillDoor) {
       }
       dispenseCount--;
       if (dispenseCount == 0) {
-        state = State::HOME;
+        setState(State::HOME);
       }
     }
   }

@@ -236,13 +236,17 @@ void DoseQuestion::onClick(int x, int y) {
     }
     Serial.print(F(" doses of "));
     Serial.println(getSelectedPrescription()->label);
-    setDesiredDose(doses);
-    if (getSelectedPrescription()->showOverride && doses > getSelectedPrescription()->getAvailableDoses()) {
-      setState(State::OVERRIDE_DOSE);
+    if (doses > 0) {
+      setDesiredDose(doses);
+      if (getSelectedPrescription()->showOverride && doses > getSelectedPrescription()->getAvailableDoses()) {
+        setState(State::OVERRIDE_DOSE);
+      } else {
+        setState(State::DISPENSING);
+        getSelectedPrescription()->use(doses);
+        dispense(getSelectedPrescription()->showOverride, doses); // so hacky
+      }
     } else {
-      setState(State::DISPENSING);
-      getSelectedPrescription()->use(doses);
-      // dispense(getSelectedPrescription()->showOverride, doses); // so hacky
+      setState(State::HOME);
     }
   }
 }
@@ -335,8 +339,9 @@ void OverrideOptions::onClick(int x, int y) {
     }
     if (clicked) {
       setState(State::DISPENSING);
-      getSelectedPrescription()->use(getDesiredDose());
-      // dispense(getSelectedPrescription()->showOverride, doses); // so hacky
+      int doses = getDesiredDose();
+      getSelectedPrescription()->use(doses);
+      dispense(getSelectedPrescription()->showOverride, doses); // so hacky
     }
   }
 }
