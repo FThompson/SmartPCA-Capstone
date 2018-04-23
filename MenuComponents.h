@@ -17,8 +17,8 @@ public:
   BackButton();
   bool isValid(State state);
   void onRepaint(Adafruit_GFX &g);
-  void onPress(TouchEvent event);
-  void onClick(TouchEvent event);
+  void onPress(int x, int y);
+  void onClick(int x, int y);
 };
 
 class MenuIcon : public Component {
@@ -28,8 +28,8 @@ public:
   MenuIcon();
   bool isValid(State state);
   void onRepaint(Adafruit_GFX &g);
-  void onPress(TouchEvent event);
-  void onClick(TouchEvent event);
+  void onPress(int x, int y);
+  void onClick(int x, int y);
 };
 
 class MenuOption : public Component {
@@ -43,8 +43,8 @@ public:
   MenuOption(int iconX, int iconY, char *text, State toState);
   bool isValid(State state);
   void onRepaint(Adafruit_GFX &g);
-  void onPress(TouchEvent event);
-  void onClick(TouchEvent event);
+  void onPress(int x, int y);
+  void onClick(int x, int y);
 };
 
 class PrescriptionInfo : public Component {
@@ -57,8 +57,17 @@ public:
   PrescriptionInfo(char *name, char *date, char *number, char *frequency);
   bool isValid(State state);
   void onRepaint(Adafruit_GFX &g);
-  void onPress(TouchEvent event) {};
-  void onClick(TouchEvent event) {};
+  void onPress(int x, int y) {};
+  void onClick(int x, int y) {};
+};
+
+class ContactPage : public Component {
+public:
+  ContactPage();
+  bool isValid(State state);
+  void onRepaint(Adafruit_GFX &g);
+  void onPress(int x, int y);
+  void onClick(int x, int y);
 };
 
 #endif

@@ -8,7 +8,7 @@
 #include <Servo.h>
 #include "LED.h"
 #include "PillDoor.h"
-#include <SD.h>
+//#include <SD.h>
 #include "States.h"
 #include "MenuComponents.h"
 #include "Component.h"
@@ -52,14 +52,16 @@
 
 // state components
 State state = State::HOME;
-Prescription leftPrescription("Opioids", 3, 3 * 60 * 60 * 1000);
-Prescription rightPrescription("Tylenol", 2, 4 * 60 * 60 * 1000);
+Prescription leftPrescription("Opioids", 3, 3 * 60 * 60 * 1000L);
+Prescription rightPrescription("Tylenol", 2, 4 * 60 * 60 * 1000L);
 Prescription* selectedPrescription;
 bool pressed = false;
+bool stateChanged = false;
 TSPoint lastPoint;
-int screenUpdateInterval = 1000 / SCREEN_HZ;
+uint8_t screenUpdateInterval = 1000 / SCREEN_HZ;
 unsigned long lastScreenUpdateTime;
 unsigned long lastTouchTime;
+unsigned long lastGlanceUpdateTime;
 
 // hardware components
 Adafruit_HX8357 tft(TFT_CS, TFT_DC);
@@ -71,15 +73,17 @@ PillDoor leftDoor(LEFT_SERVO_PIN, DISPENSE_TURN_DURATION);
 PillDoor rightDoor(RIGHT_SERVO_PIN, DISPENSE_TURN_DURATION);
 
 // software components
-int componentCount = 8;
+uint8_t componentCount = 10;
 BackButton backButton;
 MenuIcon menuIcon;
 DoseInfo leftDoseInfo(RIIT_BLUE, leftPrescription);
 DoseInfo rightDoseInfo(RIIT_PURPLE, rightPrescription);
+HelloLabel helloLabel;
 MenuOption viewRX(14, 14, "View Prescription", State::PRESCRIPTION);
 MenuOption settings(14, 14, "Settings", State::SETTINGS);
 MenuOption contact(13, 17, "Contact Doctor", State::CONTACT);
 PrescriptionInfo prescriptionInfo("John Doe", "05/05/18", "1234567", "Take 3 pills every 3 hours");
+PainQuestion painQuestion;
 Component *components[] = {
   &backButton,
   &menuIcon,
@@ -87,19 +91,41 @@ Component *components[] = {
   &settings,
   &contact,
   &prescriptionInfo,
+  &helloLabel,
   &leftDoseInfo,
-  &rightDoseInfo
+  &rightDoseInfo,
+  &painQuestion
 };
 
 void setup() {
   Serial.begin(9600);
+//  Serial.println(leftPrescription.label);
+//  Serial.println(leftPrescription.maxDose);
+//  Serial.println(leftPrescription.doseWindow);
+//  Serial.println("last dose times: ");
+//  for (int i = 0; i < leftPrescription.maxDose; i++) {
+//    Serial.println(leftPrescription.lastDoses[i]);
+//  }
+//  Serial.println("available: ");
+//  Serial.println(leftPrescription.getAvailableDoses());
+//  Serial.println("time until next dose: ");
+//  Serial.println(leftPrescription.getTimeUntilNextDose());
+//  leftPrescription.use(1);
+//  Serial.println("last dose times: ");
+//  for (int i = 0; i < leftPrescription.maxDose; i++) {
+//    Serial.println(leftPrescription.lastDoses[i]);
+//  }
+//  Serial.println("available: ");
+//  Serial.println(leftPrescription.getAvailableDoses());
+//  Serial.println("time until next dose: ");
+//  Serial.println(leftPrescription.getTimeUntilNextDose());
   tft.begin(HX8357D);
   tft.setRotation(1); // rotate to landscape mode
   tft.setFont(&FreeSans12pt7b);
   tft.fillScreen(WHITE);
-  if (!SD.begin(SD_CS)) {
-    Serial.println(F("failed to initialize SD card"));
-  }
+//  if (!SD.begin(SD_CS)) {
+//    Serial.println(F("failed to initialize SD card"));
+//  }
   backlight.turn(true);
   leftLED.turn(true);
   rightLED.turn(true);
@@ -109,6 +135,7 @@ void loop() {
   leftDoor.update();
   rightDoor.update();
   backlight.update();
+  updateGlance();
   updateComponents();
 }
 
@@ -137,18 +164,26 @@ void updateComponents() {
     }
   }
   // paint valid components, pass touch event if applicable
-  for (int i = 0; i < componentCount; i++) {
+  for (int i = 0; i < componentCount && !stateChanged; i++) {
     Component *curr = components[i];
     if (curr->isValid(state)) {
       curr->paint(tft);
       if (clicked && curr->contains(lastPoint.x, lastPoint.y)) {
-        TouchEvent event(TouchEvent::Type::CLICK, lastPoint);
-        curr->onClick(event);
+        curr->onClick(lastPoint.x, lastPoint.y);
       } else if (pressed && curr->contains(p.x, p.y)) {
-        TouchEvent event(TouchEvent::Type::PRESS, p);
-        curr->onPress(event);
+        curr->onPress(p.x, p.y);
       }
     }
+  }
+  stateChanged = false; // detects if a another component changes the state
+}
+
+void updateGlance() {
+  unsigned long ms = millis();
+  if (state == State::HOME && (ms - lastGlanceUpdateTime) < 30000) {
+//    leftDoseInfo.repaint();
+//    rightDoseInfo.repaint();
+    lastGlanceUpdateTime = ms;
   }
 }
 
@@ -194,8 +229,7 @@ void playTone() {
 void setState(State newState) {
   clearComponents();
   state = newState;
-  Serial.print("setting state to ");
-  Serial.println((int) state);
+  stateChanged = true;
 }
 
 void clearComponents() {

@@ -6,16 +6,17 @@
 #define Prescription_h
 
 class Prescription {
-  unsigned long lastDoses[];
 
 public:
   char* label;
   int maxDose;
-  int doseWindow;
+  long doseWindow; // milliseconds
+  unsigned long lastDoses[5];
 
-  Prescription(char* label, int maxDose, int doseWindow);
-  int getTimeUntilNextDose();
+  Prescription(char* label, int maxDose, long doseWindow);
+  long getTimeUntilNextDose();
   int getAvailableDoses();
+  void use(int count);
 };
 
 #endif

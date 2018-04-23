@@ -43,6 +43,9 @@ int Component::dy(int y) {
 
 void Component::paint(Adafruit_GFX &g) {
   if (needsRepaint) {
+    if (needsClear) {
+      clear(g);
+    }
     onRepaint(g);
     needsRepaint = false;
   }
@@ -53,14 +56,10 @@ void Component::repaint() {
 }
 
 void Component::clear(Adafruit_GFX &g) {
-  Serial.print("clearing ");
-  Serial.print(x);
-  Serial.print(",");
-  Serial.print(y);
-  Serial.print(",");
-  Serial.print(w);
-  Serial.print(",");
-  Serial.println(h);
   g.fillRect(x, y, w, h, WHITE);
+}
+
+void Component::requestClear() {
+  needsClear = true;
 }
 

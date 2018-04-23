@@ -59,12 +59,12 @@ void BackButton::onRepaint(Adafruit_GFX &g) {
   g.drawFastHLine(dx(5), dy(20), 30, color);
 }
 
-void BackButton::onPress(TouchEvent event) {
+void BackButton::onPress(int x, int y) {
   color = BLACK;
   repaint();
 }
 
-void BackButton::onClick(TouchEvent event) {
+void BackButton::onClick(int x, int y) {
   color = RIIT_GRAY;
   setState(getBackState());
 }
@@ -92,12 +92,12 @@ void MenuIcon::onRepaint(Adafruit_GFX &g) {
   g.fillRoundRect(dx(5), dy(27), w - 10, 6, 3, color);
 }
 
-void MenuIcon::onPress(TouchEvent event) {
+void MenuIcon::onPress(int x, int y) {
   color = BLACK;
   repaint();
 }
 
-void MenuIcon::onClick(TouchEvent event) {
+void MenuIcon::onClick(int x, int y) {
   color = RIIT_GRAY;
   setState(State::MENU);
 }
@@ -116,15 +116,16 @@ void MenuOption::onRepaint(Adafruit_GFX &g) {
   g.drawRoundRect(dx(0), dy(0), w, h, 10, backgroundColor);
   g.setCursor(dx(70), dy(30));
   g.setTextColor(RIIT_GRAY);
+  g.setTextSize(1);
   g.print(text);
 }
 
-void MenuOption::onPress(TouchEvent event) {
+void MenuOption::onPress(int x, int y) {
   backgroundColor = RIIT_LIGHT_GRAY;
   repaint();
 }
 
-void MenuOption::onClick(TouchEvent event) {
+void MenuOption::onClick(int x, int y) {
   backgroundColor = WHITE;
   setState(toState);
 }
@@ -141,6 +142,7 @@ bool PrescriptionInfo::isValid(State state) {
 
 void PrescriptionInfo::onRepaint(Adafruit_GFX &g) {
   g.setTextColor(RIIT_GRAY);
+  g.setTextSize(1);
   g.setCursor(dx(0), dy(30));
   g.print(F("Name: "));
   g.print(name);
