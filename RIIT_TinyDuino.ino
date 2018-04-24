@@ -52,7 +52,7 @@
 
 // state components
 State state = State::HOME;
-Prescription leftPrescription("Opioids", 3, 3 * 60 * 60 * 1000L, true);
+Prescription leftPrescription("Opioids", 3, 1 * 3 * 60 * 1000L, true);
 Prescription rightPrescription("Tylenol", 2, 4 * 60 * 60 * 1000L, false);
 Prescription* selectedPrescription;
 bool pressed = false;
@@ -215,9 +215,11 @@ void updateDispense(PillDoor &pillDoor) {
 
 void updateGlance() {
   unsigned long ms = millis();
-  if (state == State::HOME && (ms - lastGlanceUpdateTime) < 30000) {
-//    leftDoseInfo.repaint();
-//    rightDoseInfo.repaint();
+  if (state == State::HOME && (ms - lastGlanceUpdateTime) > 30000) {
+    leftDoseInfo.requestClear();
+    leftDoseInfo.repaint();
+    rightDoseInfo.requestClear();
+    rightDoseInfo.repaint();
     lastGlanceUpdateTime = ms;
   }
 }

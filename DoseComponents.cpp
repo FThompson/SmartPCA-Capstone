@@ -98,7 +98,7 @@ void DoseInfo::drawProgressCircle(Adafruit_GFX &g) {
     g.setCursor(dx(minutes < 10 ? 82 : 65), dy(90));
     g.print(minutes);
     g.setTextSize(1);
-    g.setCursor(dx(50), dy(120));
+    g.setCursor(dx(54), dy(120));
     g.print(F("minutes"));
   }
 }
