@@ -7,17 +7,20 @@
 
 Prescription::Prescription(char* label, int maxDose, long doseWindow, bool showOverride)
     : label(label), maxDose(maxDose), doseWindow(doseWindow), showOverride(showOverride) {
-  //lastDoses = new unsigned long[maxDose];
+
 }
 
 long Prescription::getTimeUntilNextDose() {
-  if (lastDoses[0] == 0) {
-    return 0;
-  } else {
-    long timeSinceLastDose = millis() - lastDoses[0];
-    long time = doseWindow - timeSinceLastDose;
-    return max(0, time);
+  if (lastDoses[0] > 0) {
+    for (int i = 0; i < maxDose; i++) {
+      long timeSinceLastDose = millis() - lastDoses[i];
+      long time = doseWindow * (i + 1) - timeSinceLastDose;
+      if (time >= 0) {
+        return time;
+      }
+    }
   }
+  return 0;
 }
 
 int Prescription::getAvailableDoses() {

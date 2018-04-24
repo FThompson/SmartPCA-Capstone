@@ -52,7 +52,7 @@
 
 // state components
 State state = State::HOME;
-Prescription leftPrescription("Opioids", 3, 1 * 3 * 60 * 1000L, true);
+Prescription leftPrescription("Opioids", 3, 1 * 2 * 60 * 1000L, true);
 Prescription rightPrescription("Tylenol", 2, 4 * 60 * 60 * 1000L, false);
 Prescription* selectedPrescription;
 bool pressed = false;
