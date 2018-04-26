@@ -199,18 +199,13 @@ void updateComponents() {
 }
 
 // hacky non-oop solution to multi dispense
-// call double for resetting
 void updateDispense(PillDoor &pillDoor) {
-  if (dispenseCount > 0) {
-    if (!pillDoor.isDispensing()) {
+  if (state == State::DISPENSING && !pillDoor.isDispensing()) {
+    if (dispenseCount > 0) {
       pillDoor.dispense();
-      if (dispenseCount % 2 == 0) { // actual dispense, not servo reset
-        // tone
-      }
       dispenseCount--;
-      if (dispenseCount == 0) {
-        setState(State::HOME);
-      }
+    } else if (dispenseCount == 0) {
+      setState(State::HOME);
     }
   }
 }
