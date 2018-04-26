@@ -14,14 +14,19 @@ class PillDoor {
   Servo servo;
   int pin;
   int pos;
-  int increment = 1;
+  int startPos;
+  int endPos;
+  int increment;
   int updateInterval;
   unsigned long lastUpdate;
+  bool positiveChange;
   bool dispensing = false;
+  bool resetting = false;
 
 public:
-  PillDoor(int pin, int duration); // door movement duration in millis
+  PillDoor(int pin, int duration, int startPos, int endPos); // door movement duration in millis
 
+  void attach();
   void dispense();
   void update();
   bool isDispensing();

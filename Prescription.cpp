@@ -24,7 +24,6 @@ long Prescription::getTimeUntilNextDose() {
 }
 
 int Prescription::getAvailableDoses() {
-  unsigned long lastDose = 0;
   int available = 0;
   unsigned long ms = millis();
   for (int i = 0; i < maxDose; i++) {

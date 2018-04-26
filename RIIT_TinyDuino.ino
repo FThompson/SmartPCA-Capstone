@@ -72,8 +72,8 @@ TouchScreen ts(XP, YP, XM, YM, TOUCH_RESISTANCE);
 LED leftLED(LEFT_LED_PIN);
 LED rightLED(RIGHT_LED_PIN);
 FadeableLED backlight(BACKLIGHT_PIN);
-PillDoor leftDoor(LEFT_SERVO_PIN, DISPENSE_TURN_DURATION);
-PillDoor rightDoor(RIGHT_SERVO_PIN, DISPENSE_TURN_DURATION);
+PillDoor leftDoor(LEFT_SERVO_PIN, DISPENSE_TURN_DURATION, 0, 120);
+PillDoor rightDoor(RIGHT_SERVO_PIN, DISPENSE_TURN_DURATION, 180, 60);
 
 // software components
 BackButton backButton;
@@ -140,6 +140,8 @@ void setup() {
   backlight.turn(true);
   leftLED.turn(true);
   rightLED.turn(true);
+  leftDoor.attach();
+  rightDoor.attach();
 }
 
 void loop() {
@@ -229,7 +231,7 @@ void translateTouchPoint(TSPoint &p) {
   // scale from ~0->1000 to tft.width using the calibration #'s
   p.x = map(p.x, TS_MINX, TS_MAXX, 0, tft.width());
   p.y = map(p.y, TS_MINY, TS_MAXY, 0, tft.height());
-  // map rotation to screen rotation
+  // map rotation to `````````````````````````````````````````````````````````````````````````````````````````````````````````````screen rotation
   int oldX = p.x;
   p.x = map(p.y, 0, tft.height(), 0, tft.width());
   p.y = map(oldX, 0, tft.width(), tft.height(), 0);
@@ -245,7 +247,7 @@ void dispense(bool left) {
 
 void dispense(bool left, int count) {
   leftDispense = left;
-  dispenseCount = count * 2;
+  dispenseCount = count;
 }
 
 void setDesiredDose(int count) {

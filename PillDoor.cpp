@@ -9,14 +9,31 @@
 #include "Arduino.h"
 #include <Servo.h>
 
-PillDoor::PillDoor(int pin, int duration) {
+PillDoor::PillDoor(int pin, int duration, int startPos, int endPos) {
   this->pin = pin;
-  this->updateInterval = duration / 180;
+  this->startPos = startPos;
+  this->endPos = endPos;
+  int change = endPos - startPos;
+  positiveChange = (change > 0);
+  updateInterval = duration / abs(change);
+  if (positiveChange) {
+    increment = 1;
+  } else {
+    increment = -1;
+  }
+}
+
+void PillDoor::attach() {
+  servo.attach(pin);
+  pos = startPos;
+  servo.write(startPos);
 }
 
 void PillDoor::dispense() {
-  dispensing = true;
-  this->servo.attach(pin);
+  if (!dispensing) {
+    dispensing = true;
+    resetting = false;
+  }
 }
 
 // to be called every cycle regardless of currently dispensing or not
@@ -27,10 +44,16 @@ void PillDoor::update() {
       lastUpdate = ms;
       pos += increment;
       servo.write(pos);
-      if ((pos >= 180) || (pos <= 0)) {
-        increment = -increment;
-        dispensing = false;
-        servo.detach();
+      if (resetting) {
+        if ((positiveChange && pos <= startPos) || (!positiveChange && pos >= startPos)) {
+          increment = -increment;
+          dispensing = false;
+        }
+      } else {
+        if ((positiveChange && pos >= endPos) || (!positiveChange && pos <= endPos)) {
+          increment = -increment;
+          resetting = true;
+        }
       }
     }
   }
