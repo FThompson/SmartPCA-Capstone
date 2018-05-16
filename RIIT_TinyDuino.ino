@@ -48,11 +48,11 @@
 
 // device settings
 #define SCREEN_HZ 10;
-#define DISPENSE_TURN_DURATION 1500
+#define DISPENSE_TURN_DURATION 500
 
 // state components
 State state = State::HOME;
-Prescription leftPrescription("Opioids", 3, 1 * 2 * 60 * 1000L, true);
+Prescription leftPrescription("Opioids", 3, 1 * 10 * 60 * 1000L, true);
 Prescription rightPrescription("Tylenol", 2, 4 * 60 * 60 * 1000L, false);
 Prescription* selectedPrescription;
 bool pressed = false;
